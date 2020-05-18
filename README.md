@@ -372,12 +372,12 @@ from jeffy.validator.jsonscheme import JsonSchemeValidator
 from jeffy.settings import RestApi
 app = get_app()
 
-@app.handlers.rest_api(encoding=JsonEncoding(), JsonSchemeValidator(scheme={
-    "type":"object",
-    "properties": {
-        "message": {"type":"string"}
-    }
-}))
+@app.handlers.rest_api(
+    encoding=JsonEncoding(),
+    validator=JsonSchemeValidator(scheme={
+        "type":"object",
+        "properties": {
+            "message": {"type":"string"}}}))
 def handler(event, context):
     return {
         'statusCode': 200,

@@ -1,18 +1,19 @@
-import boto3
 import json
-from typing import Any
+from typing import Any, Dict
+
+import boto3
+
+import botocore
 
 from jeffy.sdk import SdkBase
 
 
 class Kinesis(SdkBase):
-    """
-    Kinesis Client.
-    """
+    """Kinesis Client."""
 
     _resource = None
 
-    def get_resource(self) -> boto3.client:
+    def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for Kinesis.
 
@@ -24,7 +25,13 @@ class Kinesis(SdkBase):
             Kinesis._resource = boto3.client('kinesis')
         return Kinesis._resource
 
-    def put_record(self, stream_name: str, data: Any, partition_key: str, correlation_id: str = ''):
+    def put_record(
+        self,
+        stream_name: str,
+        data: Any,
+        partition_key: str,
+        correlation_id: str = ''
+    ) -> Dict:
         """
         Put recourd to Kinesis Stream with correlation_id.
 

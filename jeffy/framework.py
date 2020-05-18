@@ -8,14 +8,13 @@ app = None
 
 
 class Jeffy(object):
-    """
-    Jeffy framework main class.
-    """
+    """Jeffy framework main class."""
 
     def __init__(
         self,
         logging: Logging = Logging(),
-        rest_api: RestApi = RestApi()):
+        rest_api: RestApi = RestApi()
+    ):
         self.logger = logging.logger
         self.correlation_attr_name = logging.correlation_attr_name
         self.handlers = Handlers()
@@ -36,7 +35,7 @@ def get_app(**kwargs: dict) -> Jeffy:
 
     Returns
     -------
-    app : jeffy.framework.Jeffy
+    jeffy.framework.Jeffy
     """
     global app
     if app is None or len(kwargs) > 0:

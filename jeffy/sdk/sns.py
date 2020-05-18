@@ -1,18 +1,19 @@
-import boto3
 import json
-from typing import Any
+from typing import Any, Dict
+
+import boto3
+
+import botocore
 
 from jeffy.sdk import SdkBase
 
 
 class Sns(SdkBase):
-    """
-    SNS Client.
-    """
+    """SNS Client."""
 
     _resource = None
 
-    def get_resource(self) -> boto3.client:
+    def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for SNS.
 
@@ -24,7 +25,12 @@ class Sns(SdkBase):
             Sns._resource = boto3.client('sns')
         return Sns._resource
 
-    def publish(self, topic_arn: str, message: Any, subject: str, correlation_id: str = ''):
+    def publish(
+        self,
+        topic_arn: str,
+        message: Any,
+        subject: str, correlation_id: str = ''
+    ) -> Dict:
         """
         Send message to SNS Topic with correlationid.
 

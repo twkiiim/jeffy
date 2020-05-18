@@ -1,19 +1,20 @@
 import json
+from typing import Any, Dict
+
 import boto3
-from typing import Any
+
+import botocore
 
 from jeffy.sdk import SdkBase
 
 
 class Sqs(SdkBase):
-    """
-    SQS Client.
-    """
+    """SQS Client."""
 
     _resource = None
 
     @classmethod
-    def get_resource(self) -> boto3.client:
+    def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for SQS.
 
@@ -25,7 +26,12 @@ class Sqs(SdkBase):
             Sqs._resource = boto3.client('sqs')
         return Sqs._resource
 
-    def send_message(self, message: Any, queue_url: str, correlation_id: str = ''):
+    def send_message(
+        self,
+        message: Any,
+        queue_url: str,
+        correlation_id: str = ''
+    ) -> Dict:
         """
         Send message to SQS Queue with correlationid.
 

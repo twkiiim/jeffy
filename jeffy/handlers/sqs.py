@@ -2,19 +2,21 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
-from jeffy.validator import Validator, NoneValidator
+from jeffy.validator import NoneValidator, Validator
 
 
 class SqsHandlerMixin(object):
-    """
-    SQS event handler decorators.
-    """
+    """SQS event handler decorators."""
+
     def sqs(
         self,
         encoding: Encoding,
-        validator: Validator = NoneValidator()) -> Callable:
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
-        Decorator for sqs events. Automatically divide 'Records' for making it easy to treat it
+        Decorator for sqs events.
+
+        Automatically divide 'Records' for making it easy to treat it
         inside main process of Lambda.
 
         Usage::
@@ -25,17 +27,19 @@ class SqsHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _sqs(func: Callable) -> Callable:
+        def _sqs(func: Callable) -> Callable:   # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
+            def wrapper(event, context):        # type: ignore
+                ret = []
                 for record in event['Records']:
                     message = encoding.decode(record['body'].encode('utf-8'))
                     validator.varidate(message)
                     self.capture_correlation_id(message)
                     try:
-                        return func(message, context)
+                        ret.append(func(message, context))
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e
+                return ret
             return wrapper
         return _sqs
