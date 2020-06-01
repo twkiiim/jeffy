@@ -41,7 +41,7 @@ class TestJsonFormatter(object):
         record.stack_info = 'stack_info'
         record.msg = 123
         assert json_formatter.format(record) == json.dumps({
-            'created': '1970-01-01 09:00:01,001',
+            'created': '1970-01-01 00:00:01,001',
             "msecs": 1,
             'exc_info': 'NoneType: None',
             'stack_info': 'stack_info',
