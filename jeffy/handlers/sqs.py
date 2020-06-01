@@ -2,6 +2,7 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
+from jeffy.encoding.json import JsonEncoding
 from jeffy.validator import NoneValidator, Validator
 
 
@@ -10,7 +11,7 @@ class SqsHandlerMixin(object):
 
     def sqs(
         self,
-        encoding: Encoding,
+        encoding: Encoding = JsonEncoding(),
         validator: Validator = NoneValidator()
     ) -> Callable:
         """
@@ -27,13 +28,13 @@ class SqsHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _sqs(func: Callable) -> Callable:   # type: ignore
+        def _sqs(func: Callable):           # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):        # type: ignore
+            def wrapper(event, context):    # type: ignore
                 ret = []
                 for record in event['Records']:
                     message = encoding.decode(record['body'].encode('utf-8'))
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
                         ret.append(func(message, context))

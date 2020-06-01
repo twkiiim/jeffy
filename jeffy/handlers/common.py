@@ -23,9 +23,9 @@ class CommonHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _common(self, func: Callable) -> Callable:  # type: ignore
+        def _common(func: Callable):  # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):                # type: ignore
+            def wrapper(event, context):    # type: ignore
                 self.capture_correlation_id(event)
                 self.app.logger.info(event)
                 try:

@@ -38,10 +38,10 @@ class Handlers(
         correlation_id : str
         """
         correlation_id = ''
-        if self.app.correlation_attr_name in payload:                 # type: ignore
-            correlation_id = payload[self.app.correlation_attr_name]  # type: ignore
-        elif self.app.correlation_id_header in payload:               # type: ignore
-            correlation_id = payload[self.app.correlation_id_header]  # type: ignore
+        if self.app.correlation_attr_name in payload:                               # type: ignore
+            correlation_id = payload[self.app.correlation_attr_name]                # type: ignore
+        elif self.app.correlation_id_header in payload.get('headers', {}):          # type: ignore
+            correlation_id = payload['headers'][self.app.correlation_id_header]     # type: ignore
         else:
             correlation_id = str(uuid.uuid4())
         self.app.logger.update_context({self.app.correlation_attr_name: correlation_id})  # type: ignore

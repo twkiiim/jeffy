@@ -29,14 +29,15 @@ class Sns(SdkBase):
         self,
         topic_arn: str,
         message: Any,
-        subject: str, correlation_id: str = ''
+        subject: str,
+        correlation_id: str = ''
     ) -> Dict:
         """
         Send message to SNS Topic with correlationid.
 
         Usage::
             >>> from jeffy.sdk.sns import Sns
-            >>> Sns.publish(...)
+            >>> Sns().publish(...)
         """
         if correlation_id == '':
             correlation_id = self.app.correlation_id

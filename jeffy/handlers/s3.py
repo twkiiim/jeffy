@@ -2,6 +2,7 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
+from jeffy.encoding.bytes import BytesEncoding
 from jeffy.sdk.s3 import S3
 from jeffy.validator import NoneValidator, Validator
 
@@ -11,7 +12,7 @@ class S3HandlerMixin(object):
 
     def s3(
         self,
-        encoding: Encoding,
+        encoding: Encoding = BytesEncoding(),
         validator: Validator = NoneValidator()
     ) -> Callable:
         """
@@ -27,7 +28,7 @@ class S3HandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']
         """
-        def _s3(self, func: Callable) -> Callable:  # type: ignore
+        def _s3(func: Callable) -> Callable:  # type: ignore
             @functools.wraps(func)
             def wrapper(event, context):            # type: ignore
                 ret = []

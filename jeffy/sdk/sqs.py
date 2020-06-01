@@ -37,17 +37,14 @@ class Sqs(SdkBase):
 
         Usage::
             >>> from jeffy.sdk.sqs import Sqs
-            >>> Sqs.send_message(...)
+            >>> Sqs().send_message(...)
         """
         if correlation_id == '':
             correlation_id = self.app.correlation_id
-        try:
-            return self.get_resource().send_message(
-                QueueUrl=queue_url,
-                MessageBody=json.dumps({
-                    self.app.correlation_attr_name: correlation_id,
-                    'item': message
-                })
-            )
-        except Exception as e:
-            raise e
+        return self.get_resource().send_message(
+            QueueUrl=queue_url,
+            MessageBody=json.dumps({
+                self.app.correlation_attr_name: correlation_id,
+                'item': message
+            })
+        )

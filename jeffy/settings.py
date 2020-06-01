@@ -24,8 +24,6 @@ class Logging(object):
         correlation_attr_name: str = 'correlation_id'
             The attribute name of log records for correlation
         """
-        if logger is None:
-            logger = get_default_logger()
         self.logger = logger
         self.logger.setLevel(log_level)
         self.correlation_attr_name = correlation_attr_name

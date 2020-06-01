@@ -3,6 +3,7 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
+from jeffy.encoding.json import JsonEncoding
 from jeffy.validator import NoneValidator, Validator
 
 
@@ -32,7 +33,7 @@ class StreamsHandlerMixin(object):
                 ret = []
                 for record in event['Records']:
                     message = record['body']
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
                         ret.append(func(message, context))
@@ -45,7 +46,7 @@ class StreamsHandlerMixin(object):
 
     def kinesis_streams(
         self,
-        encoding: Encoding,
+        encoding: Encoding = JsonEncoding(),
         validator: Validator = NoneValidator()
     ) -> Callable:
         """
@@ -69,7 +70,7 @@ class StreamsHandlerMixin(object):
                 ret = []
                 for record in event['Records']:
                     message = encoding.decode(base64.b64decode(record['kinesis']['data']))
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
                         ret.append(func(message, context))

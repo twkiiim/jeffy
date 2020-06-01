@@ -19,7 +19,7 @@ class JsonEncoding(Encoding):
         -------
         payload : bytes
         """
-        return json.loads(payload).encode('utf-8')
+        return json.dumps(payload).encode('utf-8')
 
     def decode(self, payload: bytes) -> Any:
         """
@@ -38,6 +38,6 @@ class JsonEncoding(Encoding):
         jeffy.encoding.DecodeError
         """
         try:
-            return json.dumps(payload.decode('utf-8'))
+            return json.loads(payload.decode('utf-8'))
         except (json.decoder.JSONDecodeError, TypeError) as e:
             raise DecodeError(e)

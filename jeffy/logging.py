@@ -11,7 +11,7 @@ class JsonFormatter(logging.Formatter):
         """Format log record to JSON."""
         ret = {}
         for attr, value in record.__dict__.items():
-            if attr == 'asctime':
+            if attr == 'created':
                 value = self.formatTime(record)
             if attr == 'exc_info' and value is not None:
                 value = self.formatException(value)

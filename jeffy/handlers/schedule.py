@@ -21,10 +21,10 @@ class ScheduleHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _schedule(self, func: Callable) -> Callable:    # type: ignore
+        def _schedule(func: Callable) -> Callable:    # type: ignore
             @functools.wraps(func)
             def wrapper(event, context):                    # type: ignore
-                validator.varidate(event)
+                validator.validate(event)
                 self.capture_correlation_id(event)
                 try:
                     return func(event, context)

@@ -26,7 +26,7 @@ class S3(SdkBase):
         self,
         file_path: str,
         bucket_name: str,
-        object_name: str,
+        key: str,
         correlation_id: str = ''
     ) -> None:
         """
@@ -34,14 +34,14 @@ class S3(SdkBase):
 
         Usage::
             >>> from jeffy.sdk.s3 import S3
-            >>> S3.upload_file(...)
+            >>> S3().upload_file(...)
         """
         if correlation_id == '':
             correlation_id = self.app.correlation_id
         self.get_resource().upload_file(
             Filename=file_path,
             Bucket=bucket_name,
-            Key=object_name,
+            Key=key,
             ExtraArgs={
                 'Metadata': {
                     self.app.correlation_attr_name: correlation_id
