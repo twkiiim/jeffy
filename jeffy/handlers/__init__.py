@@ -1,11 +1,7 @@
-import logging
-import json
 import uuid
-import jsonschema
-from typing import Dict, Callable
+from typing import Dict
 
-from jeffy.framework import get_app
-from jeffy.encoding import Encoding
+from jeffy import framework
 from jeffy.handlers.common import CommonHandlerMixin
 from jeffy.handlers.rest_api import RestApiHandlerMixin
 from jeffy.handlers.s3 import S3HandlerMixin
@@ -22,12 +18,12 @@ class Handlers(
     ScheduleHandlerMixin,
     SnsHandlerMixin,
     SqsHandlerMixin,
-    StreamsHandlerMixin):
-    """
-    Jeffy event handler decorators.
-    """
-    def __init__(self):
-        self.app = get_app()
+    StreamsHandlerMixin
+):
+    """Jeffy event handler decorators."""
+
+    def __init__(self) -> None:
+        self.app = framework.app
 
     def capture_correlation_id(self, payload: Dict = {}) -> str:
         """
@@ -41,12 +37,13 @@ class Handlers(
         -------
         correlation_id : str
         """
-        if self.app.correlation_attr_name in payload:
-            correlation_id = payload.get(self.app.correlation_attr_name)
-        elif self.app.correlation_id_header in payload:
-            correlation_id = payload.get(self.app.correlation_id_header)
+        correlation_id = ''
+        if self.app.correlation_attr_name in payload:                               # type: ignore
+            correlation_id = payload[self.app.correlation_attr_name]                # type: ignore
+        elif self.app.correlation_id_header in payload.get('headers', {}):          # type: ignore
+            correlation_id = payload['headers'][self.app.correlation_id_header]     # type: ignore
         else:
             correlation_id = str(uuid.uuid4())
-        self.app.logger.update_context({self.app.correlation_attr_name: correlation_id})
-        self.app.correlation_id = correlation_id
+        self.app.logger.update_context({self.app.correlation_attr_name: correlation_id})  # type: ignore
+        self.app.correlation_id = correlation_id  # type: ignore
         return correlation_id

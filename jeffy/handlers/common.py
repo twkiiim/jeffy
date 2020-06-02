@@ -1,17 +1,19 @@
 import functools
 from typing import Callable
 
-from jeffy.validator import Validator, NoneValidator
+from jeffy.validator import NoneValidator, Validator
 
 
 class CommonHandlerMixin(object):
-    """
-    Common event handler decorators.
-    """
+    """Common event handler decorators."""
+
     def common(
         self,
-        validator: Validator = NoneValidator()) -> Callable:
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
+        Decorator for common event.
+
         Automatically logs payload of events and errors with the correlation ID.
 
         Usage::
@@ -21,9 +23,9 @@ class CommonHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _common(self, func: Callable) -> Callable:
+        def _common(func: Callable):  # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
+            def wrapper(event, context):    # type: ignore
                 self.capture_correlation_id(event)
                 self.app.logger.info(event)
                 try:

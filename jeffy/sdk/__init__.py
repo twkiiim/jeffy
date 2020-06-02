@@ -1,11 +1,8 @@
-import logging
-import json
-from jeffy.framework import get_app
+from jeffy import framework
 
 
 class SdkBase():
-    """
-    Jeffy SDK base class.
-    """
-    def __init__(self):
-        self.app = get_app()
+    """Jeffy SDK base class."""
+
+    def __init__(self) -> None:
+        self.app = framework.get_app()

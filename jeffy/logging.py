@@ -1,18 +1,17 @@
+import json
 import logging
 import os
-import json
-
 from typing import Dict
 
-class JsonFormatter(logging.Formatter):
-    """
-    JSON log formatter
-    """
 
-    def format(self, record):
+class JsonFormatter(logging.Formatter):
+    """JSON log formatter."""
+
+    def format(self, record):   # type: ignore
+        """Format log record to JSON."""
         ret = {}
         for attr, value in record.__dict__.items():
-            if attr == 'asctime':
+            if attr == 'created':
                 value = self.formatTime(record)
             if attr == 'exc_info' and value is not None:
                 value = self.formatException(value)
@@ -26,11 +25,9 @@ class JsonFormatter(logging.Formatter):
 
 
 class ContextLogger(logging.Logger):
-    """
-    Jeffy Logger
-    """
+    """Jeffy default logger."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):    # type: ignore
         super(ContextLogger, self).__init__(*args, **kwargs)
         self.context = {
             'aws_region': os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION'),
@@ -58,15 +55,28 @@ class ContextLogger(logging.Logger):
         """
         self.context.update(attrs)
 
-    def makeRecord(self, *args, **kwargs):
+    def makeRecord(self, *args, **kwargs):  # type: ignore
+        """Make log record."""
         record = super(ContextLogger, self).makeRecord(*args, **kwargs)
-        for k,v in self.context.items():
+        for k, v in self.context.items():
             setattr(record, k, v)
         return record
 
 
-def get_default_logger():
-    logger = ContextLogger()
+def get_default_logger(name: str = 'jeffy') -> ContextLogger:
+    """
+    Get the default logger of Jeffy.
+
+    Parameters
+    ----------
+    name: str
+        Logger name
+
+    Returns
+    -------
+    jeffy.logging.ContextLogger
+    """
+    logger = ContextLogger(name)    # type: ignore
     h = logging.StreamHandler()
     h.setFormatter(JsonFormatter())
     logger.addHandler(h)

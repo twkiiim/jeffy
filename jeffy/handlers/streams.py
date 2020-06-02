@@ -3,18 +3,21 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
-from jeffy.validator import Validator, NoneValidator
+from jeffy.encoding.json import JsonEncoding
+from jeffy.validator import NoneValidator, Validator
 
 
 class StreamsHandlerMixin(object):
-    """
-    Streams event handler decorators.
-    """
+    """Streams event handler decorators."""
+
     def dynamodb_streams(
         self,
-        validator: Validator = NoneValidator()) -> Callable:
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
-        Decorator for Dynamodb streams event. Automatically divide 'Records' for making it easy to treat it
+        Decorator for Dynamodb streams event.
+
+        Automatically divide 'Records' for making it easy to treat it
         inside main process of Lambda.
 
         Usage::
@@ -24,27 +27,32 @@ class StreamsHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _dynamodb_streams(func: Callable) -> Callable:
+        def _dynamodb_streams(func: Callable) -> Callable:  # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
+            def wrapper(event, context):                    # type: ignore
+                ret = []
                 for record in event['Records']:
                     message = record['body']
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
-                        return func(message, context)
+                        ret.append(func(message, context))
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e
+                return ret
             return wrapper
         return _dynamodb_streams
 
     def kinesis_streams(
         self,
-        encoding: Encoding,
-        validator: Validator = NoneValidator()) -> Callable:
+        encoding: Encoding = JsonEncoding(),
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
-        Decorator for Kinesis stream event. Automatically divide 'Records' for making it easy to treat it
+        Decorator for Kinesis stream event.
+
+        Automatically divide 'Records' for making it easy to treat it
         inside main process of Lambda.
 
         Usage::
@@ -55,17 +63,20 @@ class StreamsHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _kinesis_streams(func: Callable) -> Callable:
+
+        def _kinesis_streams(func: Callable) -> Callable:   # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
+            def wrapper(event, context):                    # type: ignore
+                ret = []
                 for record in event['Records']:
                     message = encoding.decode(base64.b64decode(record['kinesis']['data']))
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
-                        return func(message, context)
+                        ret.append(func(message, context))
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e
+                return ret
             return wrapper
         return _kinesis_streams

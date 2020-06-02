@@ -2,19 +2,22 @@ import functools
 from typing import Callable
 
 from jeffy.encoding import Encoding
-from jeffy.validator import Validator, NoneValidator
+from jeffy.encoding.json import JsonEncoding
+from jeffy.validator import NoneValidator, Validator
 
 
 class SnsHandlerMixin(object):
-    """
-    SNS event handler decorators.
-    """
+    """SNS event handler decorators."""
+
     def sns(
         self,
-        encoding: Encoding,
-        validator: Validator = NoneValidator()) -> Callable:
+        encoding: Encoding = JsonEncoding(),
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
-        Decorator for SNS event. Automatically divide 'Records' for making it easy to treat it
+        Decorator for SNS event.
+
+        Automatically divide 'Records' for making it easy to treat it
         inside main process of Lambda.
 
         Usage::
@@ -25,17 +28,19 @@ class SnsHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _sns(self, func: Callable) -> Callable:
+        def _sns(func: Callable):           # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
+            def wrapper(event, context):    # type: ignore
+                ret = []
                 for record in event['Records']:
                     message = encoding.decode(record['Sns']['Message'].encode('utf-8'))
-                    validator.varidate(message)
+                    validator.validate(message)
                     self.capture_correlation_id(message)
                 try:
-                    return func(message, context)
+                    ret.append(func(message, context))
                 except Exception as e:
                     self.app.logger.exception(e)
                     raise e
+                return ret
             return wrapper
         return _sns

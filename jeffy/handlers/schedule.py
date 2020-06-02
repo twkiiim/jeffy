@@ -1,16 +1,16 @@
 import functools
 from typing import Callable
 
-from jeffy.validator import Validator, NoneValidator
+from jeffy.validator import NoneValidator, Validator
 
 
 class ScheduleHandlerMixin(object):
-    """
-    Schedule event handler decorators.
-    """
+    """Schedule event handler decorators."""
+
     def schedule(
         self,
-        validator: Validator = NoneValidator()) -> Callable:
+        validator: Validator = NoneValidator()
+    ) -> Callable:
         """
         Decorator for scheduled events.
 
@@ -21,13 +21,13 @@ class ScheduleHandlerMixin(object):
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
-        def _schedule(self, func: Callable) -> Callable:
+        def _schedule(func: Callable) -> Callable:    # type: ignore
             @functools.wraps(func)
-            def wrapper(event, context):
-                validator.varidate(event)
+            def wrapper(event, context):                    # type: ignore
+                validator.validate(event)
                 self.capture_correlation_id(event)
                 try:
-                    func(event, context)
+                    return func(event, context)
                 except Exception as e:
                     raise e
             return wrapper

@@ -1,16 +1,16 @@
 import boto3
 
+import botocore
+
 from jeffy.sdk import SdkBase
 
 
 class S3(SdkBase):
-    """
-    S3 Client.
-    """
+    """S3 Client."""
 
     _resource = None
 
-    def get_resource(self):
+    def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for S3.
 
@@ -22,20 +22,26 @@ class S3(SdkBase):
             S3._resource = boto3.client('s3')
         return S3._resource
 
-    def upload_file(self, file_path: str, bucket_name: str, object_name: str, correlation_id: str = ''):
+    def upload_file(
+        self,
+        file_path: str,
+        bucket_name: str,
+        key: str,
+        correlation_id: str = ''
+    ) -> None:
         """
         Upload file to S3 bucket with correlationid.
 
         Usage::
             >>> from jeffy.sdk.s3 import S3
-            >>> S3.upload_file(...)
+            >>> S3().upload_file(...)
         """
         if correlation_id == '':
             correlation_id = self.app.correlation_id
-        return self.get_resource().upload_file(
+        self.get_resource().upload_file(
             Filename=file_path,
             Bucket=bucket_name,
-            Key=object_name,
+            Key=key,
             ExtraArgs={
                 'Metadata': {
                     self.app.correlation_attr_name: correlation_id
