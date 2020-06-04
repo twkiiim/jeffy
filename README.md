@@ -351,11 +351,11 @@ app = get_app()
 
 @app.handlers.s3
 def handler(event, context):
-    event['key'] # S3 bucket key
-    event['bucket_name'] # S3 bucket name
-    event['body'] # object stream from triggered S3 object
+    event['key']            # S3 bucket key
+    event['bucket_name']    # S3 bucket name
+    event['body']           # object stream from triggered S3 object
     event['correlation_id'] # correlation_id
-    event['metadata'] # object matadata
+    event['metadata']       # object matadata
 ```
 
 ###  2.8. <a name='schedule'></a>schedule
@@ -371,20 +371,20 @@ def handler(event, context):
 ```
 
 ##  3. <a name='Encoding'></a>Encoding
-Each handler has a default encoding, but you can change this.
-
-Each encoding class also has `encode` methods to encode `bytes` data into own encoding.
+Each handler has a a default encoding and automatically decode the data to python object. And you can change the encoding.
 
 Currently, the encodings you can choose are:
 - `jeffy.encoding.bytes.BytesEncoding`
 - `jeffy.encoding.json.JsonEncoding`
 
+Each encoding class also has `encode` methods to encode `bytes` data into own encoding.
+
 ```python
 from jeffy.framework import get_app
 from jeffy.encoding.bytes import BytesEncoding
-app = get_app()
 from jeffy.sdk.kinesis import Kinesis
 
+app = get_app()
 bytes_encoding = BytesEncoding()
 
 @app.handlers.kinesis_streams(encoding=bytes_encoding)
@@ -392,7 +392,7 @@ def handler(event, context):
     Kinesis().put_record(
         stream_name=os.environ['STREAM_NAME'],
         data=bytes_encoding.encode(bytes('foo')),
-        partition_key='uuid'
+        partition_key='your-partition-key'
     )
 ```
 
@@ -480,7 +480,7 @@ def handler(event, context):
 
 # Requirements
 
-- Python 3
+- Python 3.6 or higher
 
 Development
 -----------
