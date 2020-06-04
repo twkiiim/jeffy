@@ -13,10 +13,10 @@ suite of Utilities for Lambda functions to make it easy to develop serverless ap
 
 Mainly, Jeffy is focusing on three things.
 
-- Logging: Providing easy to see JSON format logging, auto logging as a decorator for capturing events and responses and errors, configurable to inject additional attributes what you want to see to logs.
-- Decorators: To save time to implement common things for Lambda functions, providing some useful decorators.
+- Logging: Providing easy to see JSON format logging. All decorators are capturing all events, responses and errors. And you can configure to inject additional attributes what you want to see to logs.
+- Decorators: To save time to implement common things for Lambda functions, providing some useful decorators and utiliies.
 - Tracing: Traceable events within related functions and AWS services with generating and passing `correlation_id`.
-- Environment Variables: You can define configuration for Jeffy via Environment Variables of Lambda.
+- Configurable: You can customize the framework settings easily.
 
 Note: Jeffy is still beta version so it may include some braiking changes via development process. After out of beta(v1.0 release), we will follow semantic versioning
 
@@ -62,6 +62,7 @@ $ pip install jeffy
 
 ###  1.1. <a name='BasicUsage'></a>Basic Usage
 Jeffy logger automatically inject some Lambda contexts to CloudWatchLogs.
+
 ```python
 from jeffy.framework import get_app
 
@@ -161,7 +162,7 @@ Decorators make simple to implement common lamdba tasks, such as parsing array f
 
 Here are provided decorators
 
-###  2.1. <a name='Commonhandler'></a>Common handler
+###  2.1. <a name='Commonhandler'></a>common
 `common` decorator allows you to output `event`, `response` and error infomations when you face Exceptions
 
 ```python
@@ -391,7 +392,7 @@ bytes_encoding = BytesEncoding()
 def handler(event, context):
     Kinesis().put_record(
         stream_name=os.environ['STREAM_NAME'],
-        data=bytes_encoding.encode(bytes('foo')),
+        data=bytes_encoding.encode('foo'.encode('utf-8)),
         partition_key='your-partition-key'
     )
 ```
@@ -425,7 +426,7 @@ def handler(event, context):
 ##  5. <a name='Tracing'></a>Tracing
 `correlation_id` is to trace subsequent Lambda functions and services. Jeffy automatically extract correlation IDs and caputure logs from the invocation event.
 
-Also, Jeffy provide boto3 wrapper client to create and automatically inject `correlation_id`.
+And Jeffy provide boto3 wrapper client to create and automatically inject `correlation_id`.
 
 ###  5.1. <a name='KinesisClinent'></a>Kinesis Clinent
 
@@ -485,9 +486,9 @@ def handler(event, context):
 Development
 -----------
 
--   Source hosted at [GitHub](https://github.com/marcy-terui/jeffy)
+-   Source hosted at [GitHub](https://github.com/serverless-operations/jeffy)
 -   Report issues/questions/feature requests on [GitHub
-    Issues](https://github.com/marcy-terui/jeffy/issues)
+    Issues](https://github.com/serverless-operations/jeffy/issues)
 
 Pull requests are very welcome! Make sure your patches are well tested.
 Ideally create a topic branch for every separate change you make. For
