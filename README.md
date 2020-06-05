@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/jeffy.svg)](https://badge.fury.io/py/jeffy) ![Jeffy CI](https://github.com/serverless-operations/jeffy/workflows/Jeffy%20CI/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/jeffy.svg)](https://badge.fury.io/py/jeffy) ![Jeffy CI](https://github.com/serverless-operations/jeffy/workflows/Jeffy%20CI/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python Versions](https://img.shields.io/pypi/pyversions/jeffy.svg)](https://pypi.org/project/jeffy/)
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/serverless-operations/jeffy/master/logo.png" alt="Serverless Application Framework Jeffy" width="60%">
