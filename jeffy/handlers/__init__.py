@@ -1,7 +1,6 @@
 import uuid
 from typing import Dict
 
-from jeffy import framework
 from jeffy.handlers.common import CommonHandlerMixin
 from jeffy.handlers.rest_api import RestApiHandlerMixin
 from jeffy.handlers.s3 import S3HandlerMixin
@@ -22,8 +21,8 @@ class Handlers(
 ):
     """Jeffy event handler decorators."""
 
-    def __init__(self) -> None:
-        self.app = framework.app
+    def __init__(self, app) -> None:    # type: ignore
+        self.app = app
 
     def capture_correlation_id(self, payload: Dict = {}) -> str:
         """
