@@ -17,9 +17,9 @@ class Jeffy(object):
     ):
         self.logger = logging.logger
         self.correlation_attr_name = logging.correlation_attr_name
-        self.handlers = Handlers()
         self.correlation_id_header = rest_api.correlation_id_header
         self.correlation_id = ''
+        self.handlers = Handlers(self)
 
 
 def get_app(**kwargs: dict) -> Jeffy:
