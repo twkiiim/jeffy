@@ -27,7 +27,7 @@ Mainly, Jeffy is focusing on three things.
 	* 1.3. [Change the attribute name of correlation id](#Changetheattributenameofcorrelationid)
 	* 1.4. [Change the log lervel](#Changetheloglervel)
 * 2. [Event source specific decorators](#Eventsourcespecificdecorators)
-	* 2.1. [Common handler](#Commonhandler)
+	* 2.1. [common](#common)
 	* 2.2. [rest_api](#rest_api)
 	* 2.3. [sqs](#sqs)
 	* 2.4. [sns](#sns)
@@ -162,7 +162,7 @@ Decorators make simple to implement common lamdba tasks, such as parsing array f
 
 Here are provided decorators
 
-###  2.1. <a name='Commonhandler'></a>common
+###  2.1. <a name='common'></a>common
 `common` decorator allows you to output `event`, `response` and error infomations when you face Exceptions
 
 ```python
@@ -174,7 +174,7 @@ app.logger.update_context({
    'email': 'user1@example.com'
 })
 
-@app.handlers.common
+@app.handlers.common()
 def handler(event, context):
     ...
 ```
@@ -216,7 +216,7 @@ Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.rest_api
+@app.handlers.rest_api()
 def handler(event, context):
     return {
         'statusCode': 200,
@@ -236,7 +236,7 @@ from jeffy.settings import RestApi
 app = get_app(
     rest_api=RestApi(correlation_id_header='x-foo-bar'))
 
-@app.handlers.rest_api
+@app.handlers.rest_api()
 def handler(event, context):
     return {
         'statusCode': 200,
@@ -256,7 +256,7 @@ Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.sqs
+@app.handlers.sqs()
 def handler(event, context):
     return event['foo']
     """
@@ -280,7 +280,7 @@ Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.sns
+@app.handlers.sns()
 def handler(event, context):
     return event['foo']
     """
@@ -304,7 +304,7 @@ Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.kinesis_streams
+@app.handlers.kinesis_streams()
 def handler(event, context):
     return event['foo']
     """
@@ -326,7 +326,7 @@ Decorator for dynamodb stream event. Automaticlly parse `event.Records` list fro
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.dynamodb_streams
+@app.handlers.dynamodb_streams()
 def handler(event, context):
     return event['foo']
     """
@@ -350,7 +350,7 @@ Default event payload encoding is `jeffy.encoding.bytes.BytesEncoding`.
 from jeffy.framework import get_app
 app = get_app()
 
-@app.handlers.s3
+@app.handlers.s3()
 def handler(event, context):
     event['key']            # S3 bucket key
     event['bucket_name']    # S3 bucket name
@@ -366,7 +366,7 @@ Decorator for schedule event. just captures correlation id before main Lambda pr
 from jeffy.framework import setup
 app = setup()
 
-@app.handlers.schedule
+@app.handlers.schedule()
 def handler(event, context):
     ...
 ```
@@ -431,8 +431,12 @@ And Jeffy provide boto3 wrapper client to create and automatically inject `corre
 ###  5.1. <a name='KinesisClinent'></a>Kinesis Clinent
 
 ```python
+from jeffy.framework import get_app
 from jeffy.sdk.kinesis import Kinesis
 
+app = get_app()
+
+@app.handlers.kinesis_streams()
 def handler(event, context):
     Kinesis().put_record(
         stream_name=os.environ['STREAM_NAME'],
@@ -444,8 +448,12 @@ def handler(event, context):
 ###  5.2. <a name='SNSClient'></a>SNS Client
 
 ```python
+from jeffy.framework import get_app
 from jeffy.sdk.sns import Sns
 
+app = get_app()
+
+@app.handlers.sns()
 def handler(event, context):
     Sns().publish(
         topic_arn=os.environ['TOPIC_ARN'],
@@ -457,8 +465,12 @@ def handler(event, context):
 ###  5.3. <a name='SQSClient'></a>SQS Client
 
 ```python
+from jeffy.framework import get_app
 from jeffy.sdk.sqs import Sqs
 
+app = get_app()
+
+@app.handlers.sqs()
 def handler(event, context):
     Sqs().send_message(
         queue_url=os.environ['QUEUE_URL'],
@@ -469,8 +481,12 @@ def handler(event, context):
 ###  5.4. <a name='S3Client'></a>S3 Client
 
 ```python
+from jeffy.framework import get_app
 from jeffy.sdk.s3 import S3
 
+app = get_app()
+
+@app.handlers.s3()
 def handler(event, context):
     S3().upload_file(
         file_path='/path/to/file', 
