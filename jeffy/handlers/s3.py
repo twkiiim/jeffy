@@ -3,7 +3,6 @@ from typing import Callable
 
 from jeffy.encoding import Encoding
 from jeffy.encoding.bytes import BytesEncoding
-from jeffy.sdk.s3 import S3
 from jeffy.validator import NoneValidator, Validator
 
 
@@ -31,12 +30,14 @@ class S3HandlerMixin(object):
         def _s3(func: Callable) -> Callable:  # type: ignore
             @functools.wraps(func)
             def wrapper(event, context):            # type: ignore
+                from jeffy.sdk.s3 import S3
+                s3 = S3()
                 ret = []
                 for record in event['Records']:
                     bucket = record['s3']['bucket']['name']
                     key = record['s3']['object']['key']
                     try:
-                        response = S3().get_resource().get_object(Bucket=bucket, Key=key)
+                        response = s3.get_resource().get_object(Bucket=bucket, Key=key)
                         self.capture_correlation_id(response['Metadata'])
                         body = encoding.decode(response['Body'].read())
                         validator.validate(body)
