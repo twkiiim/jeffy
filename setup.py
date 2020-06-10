@@ -8,11 +8,16 @@ import jeffy
 from setuptools import Command, find_packages, setup
 
 if sys.argv[-1] == "publish":
-    os.system("python setup.py sdist bdist_wheel upload")
+    os.system("python setup.py upload")
     sys.exit()
 
 
 class UploadCommand(Command):
+
+    user_options = []
+
+    def initialize_options(self): pass
+    def finalize_options(self):   pass
 
     def run(self):
         try:
@@ -21,6 +26,7 @@ class UploadCommand(Command):
         except FileNotFoundError:
             pass
 
+        os.system("python setup.py sdist")
         os.system('twine upload dist/*')
         os.system('git tag v{0}'.format(jeffy.__version__))
         os.system('git push --tags')

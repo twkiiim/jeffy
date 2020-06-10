@@ -4,5 +4,5 @@
 
 __author__ = "Serverless Operations <info@serverless-operations.com>"
 __status__ = "beta"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __date__ = "5 June 2020"
