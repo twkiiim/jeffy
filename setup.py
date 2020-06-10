@@ -40,7 +40,7 @@ setup_options = dict(
     install_requires=['jsonschema', 'boto3'],
     license="MIT License",
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
