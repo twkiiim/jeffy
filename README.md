@@ -405,7 +405,7 @@ def handler(event, context):
 ```python
 from jeffy.framework import get_app
 from jeffy.validator.jsonscheme import JsonSchemeValidator
-from jeffy.settings import RestApi
+
 app = get_app()
 
 @app.handlers.rest_api(
