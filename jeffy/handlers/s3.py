@@ -38,15 +38,22 @@ class S3HandlerMixin(object):
                     key = record['s3']['object']['key']
                     try:
                         response = s3.get_resource().get_object(Bucket=bucket, Key=key)
-                        self.capture_correlation_id(response['Metadata'])
+                        self.capture_correlation_id(response.get('Metadata', {}))
                         body = encoding.decode(response['Body'].read())
                         validator.validate(body)
-                        ret.append(func({
+                        self.app.logger.info({
+                            'key': key,
+                            'bucket_name': bucket,
+                            'metadata': response['Metadata']
+                        })
+                        result = func({
                             'key': key,
                             'bucket_name': bucket,
                             'body': body,
                             'metadata': response['Metadata']
-                        }, context))
+                        }, context)
+                        self.app.logger.info(result)
+                        ret.append(result)
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e

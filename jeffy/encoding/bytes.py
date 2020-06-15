@@ -10,7 +10,7 @@ class BytesEncoding(Encoding):
 
         Parameters
         ----------
-        payload: Any
+        payload: bytes
 
         Returns
         -------

@@ -37,7 +37,10 @@ class SnsHandlerMixin(object):
                     validator.validate(message)
                     self.capture_correlation_id(message)
                 try:
-                    ret.append(func(message, context))
+                    self.app.logger.info(event)
+                    result = func(message, context)
+                    self.app.logger.info(result)
+                    ret.append(result)
                 except Exception as e:
                     self.app.logger.exception(e)
                     raise e
