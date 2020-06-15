@@ -25,15 +25,16 @@ class TestSqs(object):
         m = mocker.Mock()
         m.send_message = mocker.Mock(return_value='foo')
         mocker.patch.object(sqs, 'get_resource', return_value=m)
-        sqs.app.correlation_id = 'correlation_id'
+        sqs.app.correlation_attr_name = 'correlation_id'
+        sqs.app.correlation_id = 'bar'
         assert sqs.send_message(
-            message={'foo': 'bar'},
+            message={'buz': 'qux'},
             queue_url='queue_url',
         ) == 'foo'
         m.send_message.assert_called_with(
             QueueUrl='queue_url',
             MessageBody=json.dumps({
-                sqs.app.correlation_attr_name: 'correlation_id',
-                'item': {'foo': 'bar'}
+                'buz': 'qux',
+                'correlation_id': 'bar'
             })
         )

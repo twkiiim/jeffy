@@ -1,10 +1,11 @@
-import json
 from typing import Any, Dict
 
 import boto3
 
 import botocore
 
+from jeffy.encoding import Encoding
+from jeffy.encoding.json import JsonEncoding
 from jeffy.sdk import SdkBase
 
 
@@ -12,6 +13,16 @@ class Sqs(SdkBase):
     """SQS Client."""
 
     _resource = None
+
+    def __init__(self, encoding: Encoding = JsonEncoding()):
+        """
+        Initialize SQS client.
+
+        Parameters
+        ----------
+        encoding: jeffy.encoding.Encoding
+        """
+        super(Sqs, self).__init__(encoding)
 
     @classmethod
     def get_resource(self) -> botocore.client.BaseClient:
@@ -43,8 +54,5 @@ class Sqs(SdkBase):
             correlation_id = self.app.correlation_id
         return self.get_resource().send_message(
             QueueUrl=queue_url,
-            MessageBody=json.dumps({
-                self.app.correlation_attr_name: correlation_id,
-                'item': message
-            })
+            MessageBody=self.convert_to_encoded_data(message, correlation_id).decode('utf-8')
         )
