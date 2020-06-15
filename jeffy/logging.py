@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import uuid
 from typing import Dict
 
 
@@ -81,3 +82,8 @@ def get_default_logger(name: str = 'jeffy') -> ContextLogger:
     h.setFormatter(JsonFormatter())
     logger.addHandler(h)
     return logger
+
+
+def generate_correlation_id() -> str:
+    """Generate correlation id."""
+    return str(uuid.uuid4())

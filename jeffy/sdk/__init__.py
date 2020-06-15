@@ -3,6 +3,7 @@ from typing import Any
 from jeffy import framework
 from jeffy.encoding import Encoding
 from jeffy.encoding.bytes import BytesEncoding
+from jeffy.logging import generate_correlation_id
 
 
 class SdkBase():
@@ -30,8 +31,10 @@ class SdkBase():
         """
         if not isinstance(data, dict):
             data = {'message': data}
-        if correlation_id == '':
+        if correlation_id != '':
+            data[self.app.correlation_attr_name] = correlation_id
+        elif self.app.correlation_id != '':
             data[self.app.correlation_attr_name] = self.app.correlation_id
         else:
-            data[self.app.correlation_attr_name] = correlation_id
+            data[self.app.correlation_attr_name] = generate_correlation_id()
         return self.encoding.encode(data)

@@ -6,6 +6,7 @@ import sys
 from jeffy.logging import (
     ContextLogger,
     JsonFormatter,
+    generate_correlation_id,
     get_default_logger)
 
 import pytest
@@ -80,3 +81,8 @@ class TestContextLogger(object):
 def test_get_default_logger():
     """It can get the default logger."""
     assert isinstance(get_default_logger(), ContextLogger)
+
+
+def test_generate_correlation_id():
+    """It can get the new correlation_id."""
+    assert isinstance(generate_correlation_id(), str)
