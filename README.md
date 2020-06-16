@@ -404,7 +404,7 @@ def handler(event, context):
 
 ```python
 from jeffy.framework import get_app
-from jeffy.validator.jsonscheme import JsonSchemeValidator
+from jeffy.validator.jsonschema import JsonSchemeValidator
 
 app = get_app()
 
