@@ -37,7 +37,7 @@ class SqsHandlerMixin(object):
                     validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
-                        self.app.logger.info(event)
+                        self.app.logger.info(message)
                         result = func(message, context)
                         self.app.logger.info(event)
                         ret.append(result)

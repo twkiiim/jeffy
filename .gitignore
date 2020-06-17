@@ -132,5 +132,8 @@ pip-selfcheck.json
 # vscode
 .vscode
 
+# sls
+node_modules
+.serverless
 
 # End of https://www.gitignore.io/api/python
