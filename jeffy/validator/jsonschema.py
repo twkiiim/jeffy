@@ -5,22 +5,22 @@ from jeffy.validator import ValidationError, Validator
 import jsonschema
 
 
-class JsonSchemeValidator(Validator):
+class JsonSchemaValidator(Validator):
     """JSON scheme validator."""
 
-    def __init__(self, scheme: Dict):
+    def __init__(self, schema: Dict):
         """
         Initialize JsonSchemeValidator.
 
         Parameters
         ----------
-        scheme: Dict
+        schema: Dict
         """
-        self.scheme = scheme
+        self.schema = schema
 
     def validate(self, data: Any) -> None:
         """
-        Validate the data by JSON scheme.
+        Validate the data by JSON schema.
 
         Parameters
         ----------
@@ -31,6 +31,6 @@ class JsonSchemeValidator(Validator):
         jeffy.validator.ValidationError
         """
         try:
-            jsonschema.validate(data, self.scheme)
+            jsonschema.validate(data, self.schema)
         except jsonschema.ValidationError as e:
             raise ValidationError(e)

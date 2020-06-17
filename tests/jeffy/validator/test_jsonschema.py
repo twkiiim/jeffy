@@ -1,19 +1,19 @@
 from jeffy.validator import ValidationError
-from jeffy.validator.jsonschema import JsonSchemeValidator
+from jeffy.validator.jsonschema import JsonSchemaValidator
 
 import pytest
 
 
 @pytest.fixture
 def jsonschema_validator():
-    """Get JsonSchemeValidator class."""
-    return JsonSchemeValidator(scheme={
+    """Get JsonSchemaValidator class."""
+    return JsonSchemaValidator(schema={
         'type': 'object',
         'properties': {
             'message': {'type': 'string'}}})
 
 
-class TestJsonSchemeValidator(object):
+class TestJsonSchemaValidator(object):
     """JSON scheme validator test."""
 
     def test_validate(self, jsonschema_validator):

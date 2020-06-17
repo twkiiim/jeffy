@@ -32,11 +32,14 @@ class StreamsHandlerMixin(object):
             def wrapper(event, context):                    # type: ignore
                 ret = []
                 for record in event['Records']:
-                    message = record['body']
+                    message = record['dynamodb']
                     validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
-                        ret.append(func(message, context))
+                        self.app.logger.info(message)
+                        result = func(message, context)
+                        self.app.logger.info(result)
+                        ret.append(result)
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e
@@ -73,7 +76,10 @@ class StreamsHandlerMixin(object):
                     validator.validate(message)
                     self.capture_correlation_id(message)
                     try:
-                        ret.append(func(message, context))
+                        self.app.logger.info(message)
+                        result = func(message, context)
+                        self.app.logger.info(result)
+                        ret.append(result)
                     except Exception as e:
                         self.app.logger.exception(e)
                         raise e

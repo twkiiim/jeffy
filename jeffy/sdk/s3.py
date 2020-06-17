@@ -2,6 +2,8 @@ import boto3
 
 import botocore
 
+from jeffy.encoding import Encoding
+from jeffy.encoding.bytes import BytesEncoding
 from jeffy.sdk import SdkBase
 
 
@@ -10,6 +12,17 @@ class S3(SdkBase):
 
     _resource = None
 
+    def __init__(self, encoding: Encoding = BytesEncoding()):
+        """
+        Initialize S3 client.
+
+        Parameters
+        ----------
+        encoding: jeffy.encoding.Encoding
+        """
+        super(S3, self).__init__(encoding)
+
+    @classmethod
     def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for S3.

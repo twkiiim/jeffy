@@ -1,10 +1,11 @@
-import json
 from typing import Any, Dict
 
 import boto3
 
 import botocore
 
+from jeffy.encoding import Encoding
+from jeffy.encoding.json import JsonEncoding
 from jeffy.sdk import SdkBase
 
 
@@ -13,6 +14,17 @@ class Sns(SdkBase):
 
     _resource = None
 
+    def __init__(self, encoding: Encoding = JsonEncoding()):
+        """
+        Initialize SNS client.
+
+        Parameters
+        ----------
+        encoding: jeffy.encoding.Encoding
+        """
+        super(Sns, self).__init__(encoding)
+
+    @classmethod
     def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for SNS.
@@ -43,9 +55,5 @@ class Sns(SdkBase):
             correlation_id = self.app.correlation_id
         return self.get_resource().publish(
             TopicArn=topic_arn,
-            Message=json.dumps({
-                self.app.correlation_attr_name: correlation_id,
-                'item': message
-            }),
-            Subject=subject
-        )
+            Message=self.convert_to_encoded_data(message, correlation_id).decode('utf-8'),
+            Subject=subject)

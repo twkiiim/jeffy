@@ -49,7 +49,7 @@ class TestHandlers(object):
         dynamodb_streams = handlers.dynamodb_streams()
         _dynamodb_streams = dynamodb_streams(mock)
         assert _dynamodb_streams(
-            {'Records': [{'body': {'buz': 'qux'}}]},
+            {'Records': [{'dynamodb': {'buz': 'qux'}}]},
             None
         ) == ['foo']
 
@@ -59,7 +59,7 @@ class TestHandlers(object):
         dynamodb_streams = handlers.dynamodb_streams()
         _dynamodb_streams = dynamodb_streams(mock)
         with pytest.raises(Exception):
-            _dynamodb_streams({'Records': [{'body': {'buz': 'qux'}}]}, None)
+            _dynamodb_streams({'Records': [{'dynamodb': {'buz': 'qux'}}]}, None)
 
     def test_kinesis_streams(self, handlers, mocker):
         """It can process kinesis stream events."""

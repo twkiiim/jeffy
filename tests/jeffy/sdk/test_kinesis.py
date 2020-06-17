@@ -25,17 +25,18 @@ class TestKinesis(object):
         m = mocker.Mock()
         m.put_record = mocker.Mock(return_value='foo')
         mocker.patch.object(kinesis, 'get_resource', return_value=m)
-        kinesis.app.correlation_id = 'correlation_id'
+        kinesis.app.correlation_attr_name = 'correlation_id'
+        kinesis.app.correlation_id = 'bar'
         assert kinesis.put_record(
             stream_name='stream_name',
-            data={'foo': 'bar'},
+            data={'buz': 'qux'},
             partition_key='partition_key'
         ) == 'foo'
         m.put_record.assert_called_with(
             StreamName='stream_name',
             Data=json.dumps({
-                kinesis.app.correlation_attr_name: 'correlation_id',
-                'item': {'foo': 'bar'}
-            }),
+                'buz': 'qux',
+                kinesis.app.correlation_attr_name: 'bar'
+            }).encode('utf-8'),
             PartitionKey='partition_key'
         )
