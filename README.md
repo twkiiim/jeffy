@@ -42,7 +42,7 @@ Mainly, Jeffy is focusing on three things.
 	* 3.4. [S3 Client](#S3Client)
 * 4. [Encoding](#Encoding)
 * 5. [Validation](#Validation)
-	* 5.1. [JSON Scheme Validator](#JSONSchemeValidator)
+	* 5.1. [JSONSchemaValidator](#JSONSchemaValidator)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -344,6 +344,8 @@ def handler(event, context):
 ###  2.7. <a name='s3'></a>s3
 Decorator for S3 event. Automatically parse body stream from triggered S3 object and S3 bucket and key name to Lambda.
 
+**This handler requires `s3:GetObject` permission.**
+
 Default encoding is `jeffy.encoding.bytes.BytesEncoding`.
 
 ```python
@@ -354,7 +356,7 @@ app = get_app()
 def handler(event, context):
     event['key']            # S3 bucket key
     event['bucket_name']    # S3 bucket name
-    event['body']           # object stream from triggered S3 object
+    event['body']           # Bytes data of the object
     event['correlation_id'] # correlation_id
     event['metadata']       # object matadata
 ```
@@ -375,6 +377,8 @@ def handler(event, context):
 Jeffy has the original wrapper clients of AWS SDK(boto3). The clients automatically inject `correlation_id`  in the event payload and encode it to the specified(or default) encoding. 
 
 ###  3.1. <a name='KinesisClinent'></a>Kinesis Clinent
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -476,17 +480,17 @@ def handler(event, context):
 
 ##  5. <a name='Validation'></a>Validation
 
-###  5.1. <a name='JSONSchemeValidator'></a>JSON Scheme Validator
-`JsonSchemeValidator` is automatically validate event payload with following json scheme you define. raise `ValidationError` exception if the validation fails.
+###  5.1. <a name='JSONSchemaValidator'></a>JSONSchemaValidator
+`JsonSchemaValidator` is automatically validate event payload with following json schema you define. raise `ValidationError` exception if the validation fails.
 
 ```python
 from jeffy.framework import get_app
-from jeffy.validator.jsonscheme import JsonSchemeValidator
+from jeffy.validator.jsonschema import JsonSchemaValidator
 
 app = get_app()
 
 @app.handlers.rest_api(
-    validator=JsonSchemeValidator(scheme={
+    validator=JsonSchemaValidator(schema={
         'type': 'object',
         'properties': {
             'message': {'type': 'string'}}}))
