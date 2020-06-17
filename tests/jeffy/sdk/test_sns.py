@@ -25,17 +25,18 @@ class TestSns(object):
         m = mocker.Mock()
         m.publish = mocker.Mock(return_value='foo')
         mocker.patch.object(sns, 'get_resource', return_value=m)
-        sns.app.correlation_id = 'correlation_id'
+        sns.app.correlation_attr_name = 'correlation_id'
+        sns.app.correlation_id = 'bar'
         assert sns.publish(
-            message={'foo': 'bar'},
+            message={'buz': 'qux'},
             topic_arn='topic_arn',
             subject='subject'
         ) == 'foo'
         m.publish.assert_called_with(
             TopicArn='topic_arn',
             Message=json.dumps({
-                sns.app.correlation_attr_name: 'correlation_id',
-                'item': {'foo': 'bar'}
+                'buz': 'qux',
+                'correlation_id': 'bar'
             }),
             Subject='subject'
         )

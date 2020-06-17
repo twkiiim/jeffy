@@ -1,10 +1,11 @@
-import json
 from typing import Any, Dict
 
 import boto3
 
 import botocore
 
+from jeffy.encoding import Encoding
+from jeffy.encoding.json import JsonEncoding
 from jeffy.sdk import SdkBase
 
 
@@ -13,6 +14,17 @@ class Kinesis(SdkBase):
 
     _resource = None
 
+    def __init__(self, encoding: Encoding = JsonEncoding()):
+        """
+        Initialize Kinesis client.
+
+        Parameters
+        ----------
+        encoding: jeffy.encoding.Encoding
+        """
+        super(Kinesis, self).__init__(encoding)
+
+    @classmethod
     def get_resource(self) -> botocore.client.BaseClient:
         """
         Get boto3 client for Kinesis.
@@ -39,13 +51,8 @@ class Kinesis(SdkBase):
             >>> from jeffy.sdk.kinesis import Kinesis
             >>> Kinesis().put_record(...)
         """
-        if correlation_id == '':
-            correlation_id = self.app.correlation_id
         return self.get_resource().put_record(
             StreamName=stream_name,
-            Data=json.dumps({
-                self.app.correlation_attr_name: correlation_id,
-                'item': data
-            }),
+            Data=self.convert_to_encoded_data(data, correlation_id),
             PartitionKey=partition_key,
         )

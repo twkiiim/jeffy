@@ -52,9 +52,11 @@ class RestApiHandlerMixin(object):
                                     'error_message': str(e)
                                 })
                             }
+                    self.app.logger.info(event)
                     ret = func(event, context)
                     if ret.get('headers') is not None:
                         ret['headers'].update({self.app.correlation_id_header: self.app.correlation_id})
+                    self.app.logger.info(ret)
                     return ret
                 except Exception as e:
                     self.app.logger.exception(e)

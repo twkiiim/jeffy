@@ -27,7 +27,10 @@ class ScheduleHandlerMixin(object):
                 validator.validate(event)
                 self.capture_correlation_id(event)
                 try:
-                    return func(event, context)
+                    self.app.logger.info(event)
+                    ret = func(event, context)
+                    self.app.logger.info(ret)
+                    return ret
                 except Exception as e:
                     raise e
             return wrapper

@@ -1,18 +1,16 @@
-from typing import Any
-
 from jeffy.encoding import Encoding
 
 
 class BytesEncoding(Encoding):
     """Bytes encoding class."""
 
-    def encode(self, payload: Any) -> bytes:
+    def encode(self, payload: bytes) -> bytes:
         """
         Encode to bytes.
 
         Parameters
         ----------
-        payload: Any
+        payload: bytes
 
         Returns
         -------
@@ -20,7 +18,7 @@ class BytesEncoding(Encoding):
         """
         return payload
 
-    def decode(self, payload: bytes) -> Any:
+    def decode(self, payload: bytes) -> bytes:
         """
         Decode from bytes.
 

@@ -27,11 +27,11 @@ class CommonHandlerMixin(object):
             @functools.wraps(func)
             def wrapper(event, context):    # type: ignore
                 self.capture_correlation_id(event)
-                self.app.logger.info(event)
                 try:
-                    result = func(event, context)
-                    self.app.logger.info(result)
-                    return result
+                    self.app.logger.info(event)
+                    ret = func(event, context)
+                    self.app.logger.info(ret)
+                    return ret
                 except Exception as e:
                     self.app.logger.exception(e)
                     raise e

@@ -1,4 +1,3 @@
-import uuid
 from typing import Dict
 
 from jeffy.handlers.common import CommonHandlerMixin
@@ -8,6 +7,7 @@ from jeffy.handlers.schedule import ScheduleHandlerMixin
 from jeffy.handlers.sns import SnsHandlerMixin
 from jeffy.handlers.sqs import SqsHandlerMixin
 from jeffy.handlers.streams import StreamsHandlerMixin
+from jeffy.logging import generate_correlation_id
 
 
 class Handlers(
@@ -42,7 +42,7 @@ class Handlers(
         elif self.app.correlation_id_header in payload.get('headers', {}):          # type: ignore
             correlation_id = payload['headers'][self.app.correlation_id_header]     # type: ignore
         else:
-            correlation_id = str(uuid.uuid4())
+            correlation_id = generate_correlation_id()
         self.app.logger.update_context({self.app.correlation_attr_name: correlation_id})  # type: ignore
         self.app.correlation_id = correlation_id  # type: ignore
         return correlation_id

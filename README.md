@@ -26,7 +26,7 @@ Mainly, Jeffy is focusing on three things.
 	* 1.2. [Injecting additional attributes to logs](#Injectingadditionalattributestologs)
 	* 1.3. [Change the attribute name of correlation id](#Changetheattributenameofcorrelationid)
 	* 1.4. [Change the log lervel](#Changetheloglervel)
-* 2. [Event source specific decorators](#Eventsourcespecificdecorators)
+* 2. [Event handlers](#Eventhandlers)
 	* 2.1. [common](#common)
 	* 2.2. [rest_api](#rest_api)
 	* 2.3. [sqs](#sqs)
@@ -35,14 +35,14 @@ Mainly, Jeffy is focusing on three things.
 	* 2.6. [dynamodb_streams](#dynamodb_streams)
 	* 2.7. [s3](#s3)
 	* 2.8. [schedule](#schedule)
-* 3. [Encoding](#Encoding)
-* 4. [Validation](#Validation)
-	* 4.1. [JSON Scheme Validator](#JSONSchemeValidator)
-* 5. [Tracing](#Tracing)
-	* 5.1. [Kinesis Clinent](#KinesisClinent)
-	* 5.2. [SNS Client](#SNSClient)
-	* 5.3. [SQS Client](#SQSClient)
-	* 5.4. [S3 Client](#S3Client)
+* 3. [SDK](#SDK)
+	* 3.1. [Kinesis Clinent](#KinesisClinent)
+	* 3.2. [SNS Client](#SNSClient)
+	* 3.3. [SQS Client](#SQSClient)
+	* 3.4. [S3 Client](#S3Client)
+* 4. [Encoding](#Encoding)
+* 5. [Validation](#Validation)
+	* 5.1. [JSON Scheme Validator](#JSONSchemeValidator)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -157,7 +157,7 @@ def handler(event, context):
     app.logger.info({'foo': 'bar'})
 ```
 
-##  2. <a name='Eventsourcespecificdecorators'></a>Event source specific decorators
+##  2. <a name='Eventhandlers'></a>Event handlers
 Decorators make simple to implement common lamdba tasks, such as parsing array from Kinesis, SNS, SQS events etc.
 
 Here are provided decorators
@@ -210,7 +210,7 @@ Error output with auto_logging
 ###  2.2. <a name='rest_api'></a>rest_api
 Decorator for API Gateway event. Automatically get the correlation id from request header and set the correlation id to response header.
 
-Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -250,7 +250,7 @@ def handler(event, context):
 ###  2.3. <a name='sqs'></a>sqs
 Decorator for sqs event. Automaticlly parse `"event.Records"` list from SQS event source to each items for making it easy to treat it inside main process of Lambda.
 
-Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -274,7 +274,7 @@ def handler(event, context):
 ###  2.4. <a name='sns'></a>sns
 Decorator for sns event. Automaticlly parse `event.Records` list from SNS event source to each items for making it easy to treat it inside main process of Lambda.
 
-Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -298,7 +298,7 @@ def handler(event, context):
 ###  2.5. <a name='kinesis_streams'></a>kinesis_streams
 Decorator for kinesis stream event. Automaticlly parse `event.Records` list from Kinesis event source to each items and decode it with base64 for making it easy to treat it inside main process of Lambda.
 
-Default event payload encoding is `jeffy.encoding.json.JsonEncoding`.
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -344,7 +344,7 @@ def handler(event, context):
 ###  2.7. <a name='s3'></a>s3
 Decorator for S3 event. Automatically parse body stream from triggered S3 object and S3 bucket and key name to Lambda.
 
-Default event payload encoding is `jeffy.encoding.bytes.BytesEncoding`.
+Default encoding is `jeffy.encoding.bytes.BytesEncoding`.
 
 ```python
 from jeffy.framework import get_app
@@ -371,8 +371,84 @@ def handler(event, context):
     ...
 ```
 
-##  3. <a name='Encoding'></a>Encoding
-Each handler has a a default encoding and automatically decode the data to python object. And you can change the encoding.
+##  3. <a name='SDK'></a>SDK
+Jeffy has the original wrapper clients of AWS SDK(boto3). The clients automatically inject `correlation_id`  in the event payload and encode it to the specified(or default) encoding. 
+
+###  3.1. <a name='KinesisClinent'></a>Kinesis Clinent
+
+```python
+from jeffy.framework import get_app
+from jeffy.sdk.kinesis import Kinesis
+
+app = get_app()
+
+@app.handlers.kinesis_streams()
+def handler(event, context):
+    Kinesis().put_record(
+        stream_name=os.environ['STREAM_NAME'],
+        data={'foo': 'bar'},
+        partition_key='your_partition_key'
+    )
+```
+
+###  3.2. <a name='SNSClient'></a>SNS Client
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
+
+```python
+from jeffy.framework import get_app
+from jeffy.sdk.sns import Sns
+
+app = get_app()
+
+@app.handlers.sns()
+def handler(event, context):
+    Sns().publish(
+        topic_arn=os.environ['TOPIC_ARN'],
+        subject='hello',
+        message='world'
+    )
+```
+
+###  3.3. <a name='SQSClient'></a>SQS Client
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
+
+```python
+from jeffy.framework import get_app
+from jeffy.sdk.sqs import Sqs
+
+app = get_app()
+
+@app.handlers.sqs()
+def handler(event, context):
+    Sqs().send_message(
+        queue_url=os.environ['QUEUE_URL'],
+        message='hello world'
+    )
+```
+
+###  3.4. <a name='S3Client'></a>S3 Client
+
+Default encoding is `jeffy.encoding.bytes.BytesEncoding`.
+
+```python
+from jeffy.framework import get_app
+from jeffy.sdk.s3 import S3
+
+app = get_app()
+
+@app.handlers.s3()
+def handler(event, context):
+    S3().upload_file(
+        file_path='/path/to/file', 
+        bucket_name=os.environ['BUCKET_NAME'],
+        key='key/of/object'
+    )
+```
+
+##  4. <a name='Encoding'></a>Encoding
+Each handler and SDK client has a default encoding and automatically encode/decode the data from/to python object. And you can change the encoding.
 
 Currently, the encodings you can choose are:
 - `jeffy.encoding.bytes.BytesEncoding`
@@ -390,21 +466,22 @@ bytes_encoding = BytesEncoding()
 
 @app.handlers.kinesis_streams(encoding=bytes_encoding)
 def handler(event, context):
-    Kinesis().put_record(
+    kinesis = Kinesis(encoding=bytes_encoding)
+    kinesis.put_record(
         stream_name=os.environ['STREAM_NAME'],
         data=bytes_encoding.encode('foo'.encode('utf-8)),
         partition_key='your-partition-key'
     )
 ```
 
-##  4. <a name='Validation'></a>Validation
+##  5. <a name='Validation'></a>Validation
 
-###  4.1. <a name='JSONSchemeValidator'></a>JSON Scheme Validator
+###  5.1. <a name='JSONSchemeValidator'></a>JSON Scheme Validator
 `JsonSchemeValidator` is automatically validate event payload with following json scheme you define. raise `ValidationError` exception if the validation fails.
 
 ```python
 from jeffy.framework import get_app
-from jeffy.validator.jsonschema import JsonSchemeValidator
+from jeffy.validator.jsonscheme import JsonSchemeValidator
 
 app = get_app()
 
@@ -421,78 +498,6 @@ def handler(event, context):
             'message': 'ok.'
         })
     }
-```
-
-##  5. <a name='Tracing'></a>Tracing
-`correlation_id` is to trace subsequent Lambda functions and services. Jeffy automatically extract correlation IDs and caputure logs from the invocation event.
-
-And Jeffy provide boto3 wrapper client to create and automatically inject `correlation_id`.
-
-###  5.1. <a name='KinesisClinent'></a>Kinesis Clinent
-
-```python
-from jeffy.framework import get_app
-from jeffy.sdk.kinesis import Kinesis
-
-app = get_app()
-
-@app.handlers.kinesis_streams()
-def handler(event, context):
-    Kinesis().put_record(
-        stream_name=os.environ['STREAM_NAME'],
-        data={'foo': 'bar'},
-        partition_key='your_partition_key'
-    )
-```
-
-###  5.2. <a name='SNSClient'></a>SNS Client
-
-```python
-from jeffy.framework import get_app
-from jeffy.sdk.sns import Sns
-
-app = get_app()
-
-@app.handlers.sns()
-def handler(event, context):
-    Sns().publish(
-        topic_arn=os.environ['TOPIC_ARN'],
-        subject='hello',
-        message='world'
-    )
-```
-
-###  5.3. <a name='SQSClient'></a>SQS Client
-
-```python
-from jeffy.framework import get_app
-from jeffy.sdk.sqs import Sqs
-
-app = get_app()
-
-@app.handlers.sqs()
-def handler(event, context):
-    Sqs().send_message(
-        queue_url=os.environ['QUEUE_URL'],
-        message='hello world'
-    )
-```
-
-###  5.4. <a name='S3Client'></a>S3 Client
-
-```python
-from jeffy.framework import get_app
-from jeffy.sdk.s3 import S3
-
-app = get_app()
-
-@app.handlers.s3()
-def handler(event, context):
-    S3().upload_file(
-        file_path='/path/to/file', 
-        bucket_name=os.environ['BUCKET_NAME'],
-        key='key/of/object'
-    )
 ```
 
 # Requirements

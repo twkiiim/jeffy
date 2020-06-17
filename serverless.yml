@@ -1,0 +1,109 @@
+service: jeffy
+
+plugins:
+  - serverless-python-requirements
+
+package:
+  exclude:
+    - node_modules/**
+    - .tox/**
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: ${opt:region, 'us-west-2'}
+  stage: ${opt:stage, 'dev'}
+  timeout: 30
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "dynamodb:*"
+        - "sqs:*"
+        - "sns:*"
+        - "kinesis:*"
+        - "s3:*"
+      Resource:
+        - "*"
+
+functions:
+  StartTest:
+    handler: handler.start_test
+    environment:
+      API_URL:
+        Fn::Join: ["", [
+          "https://",
+          { "Ref": "ApiGatewayRestApi" },
+          ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}/test"
+        ]]
+      TOPIC_ARN:
+        Ref: TestTopic
+      STREAM_NAME:
+        Ref: TestStream
+      QUEUE_URL:
+        Ref: TestQueue
+      TABLE_NAME:
+        Ref: TestTable
+      BUCKET_NAME: jeffy-s3-test
+  RestApiTest:
+    handler: handler.rest_api_test
+    events:
+      - http:
+          path: test
+          method: post
+  SnsTest:
+    handler: handler.sns_test
+    events:
+      - sns:
+          arn:
+            Ref: TestTopic
+          topicName: jeffy-sns-test
+  SqsTest:
+    handler: handler.sqs_test
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [TestQueue, Arn]
+  KinesisTest:
+    handler: handler.kinesis_test
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            Fn::GetAtt: [TestStream, Arn]
+  DynamoTest:
+    handler: handler.dynamodb_test
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [TestTable, StreamArn]
+  S3Test:
+    handler: handler.s3_test
+    events:
+      - s3:
+          bucket: jeffy-s3-test
+          event: s3:ObjectCreated:*
+resources:
+  Resources:
+    TestTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: jeffy-sns-test
+    TestQueue:
+      Type: AWS::SQS::Queue
+    TestStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        ShardCount: 1
+    TestTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
