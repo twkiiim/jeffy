@@ -376,8 +376,6 @@ Jeffy has the original wrapper clients of AWS SDK(boto3). The clients automatica
 
 ###  3.1. <a name='KinesisClinent'></a>Kinesis Clinent
 
-Default encoding is `jeffy.encoding.json.JsonEncoding`.
-
 ```python
 from jeffy.framework import get_app
 from jeffy.sdk.kinesis import Kinesis
