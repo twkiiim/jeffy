@@ -1,4 +1,5 @@
 import functools
+import urllib.parse
 from typing import Callable
 
 from jeffy.encoding import Encoding
@@ -35,7 +36,7 @@ class S3HandlerMixin(object):
                 ret = []
                 for record in event['Records']:
                     bucket = record['s3']['bucket']['name']
-                    key = record['s3']['object']['key']
+                    key = urllib.parse.unquote_plus(record['s3']['object']['key'])
                     try:
                         response = s3.get_resource().get_object(Bucket=bucket, Key=key)
                         self.capture_correlation_id(response.get('Metadata', {}))
