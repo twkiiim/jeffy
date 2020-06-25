@@ -452,13 +452,17 @@ def handler(event, context):
 ```
 
 ##  4. <a name='Encoding'></a>Encoding
+Jeffy encoder works as a type in order to consistent the specification of messages between AWS Lambda and other AWS services. This allows you to implement Lambda function more safely, efficiently and solidly by defining the type of messages from the begging to the end of the microservices.
+
 Each handler and SDK client has a default encoding and automatically encode/decode the data from/to python object. And you can change the encoding.
 
 Currently, the encodings you can choose are:
-- `jeffy.encoding.bytes.BytesEncoding`
-- `jeffy.encoding.json.JsonEncoding`
+- `jeffy.encoding.bytes.BytesEncoding` : For using binary data.
+- `jeffy.encoding.json.JsonEncoding` : For using JSON format. At this time, Jeffy uses this as a default encoder except for Amazon S3.
 
-Each encoding class also has `encode` methods to encode `bytes` data into own encoding.
+Jeffy internally uses AWS SDK for python which is a wrapper of boto3. When publishing the message to AWS Services from Lambda function, Jeffy encodes automatically with a default encoder. On the other hand, when AWS Lambda subscribes to messages, Jeffy decodes automatically with the encoder of each AWS Services that is the event source. After thet, you can handle messages inside of Lambda function.
+
+Each encoding class also has `encode` methods to encode `bytes` data into own encoding. Thus the developer can set a specific encoder you want to use.
 
 ```python
 from jeffy.framework import get_app
@@ -477,6 +481,8 @@ def handler(event, context):
         partition_key='your-partition-key'
     )
 ```
+
+This encoding mechanism simplifies to consistent the specification of messages of the event-driven architecture which is consist of Pub - Sub style.
 
 ##  5. <a name='Validation'></a>Validation
 
