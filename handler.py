@@ -1,8 +1,11 @@
 import json
+import logging
 import os
 import uuid
 
 from jeffy.framework import get_app
+from jeffy.logging.handlers.firehose import KinesisFirehoseHandler
+from jeffy.settings import Logging
 from jeffy.sdk.kinesis import Kinesis
 from jeffy.sdk.s3 import S3
 from jeffy.sdk.sns import Sns
@@ -11,7 +14,11 @@ from jeffy.sdk.sqs import Sqs
 import boto3
 import requests
 
-app = get_app()
+app = get_app(logging=Logging(handlers=[
+    logging.StreamHandler(),
+    KinesisFirehoseHandler(
+        stream_name=os.environ['FIREHOSE_NAME']
+    )]))
 
 
 @app.handlers.common()

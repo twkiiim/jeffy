@@ -31,7 +31,7 @@ def get_app(**kwargs: dict) -> Jeffy:
     logging: jeffy.settings.Logging
         Logging settings
     http_api: jeffy.settings.RestApi
-        Logging settings
+        REST API settings
 
     Returns
     -------

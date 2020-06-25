@@ -6,8 +6,8 @@ import sys
 from jeffy.logging import (
     ContextLogger,
     JsonFormatter,
-    generate_correlation_id,
-    get_default_logger)
+    generate_correlation_id
+)
 
 import pytest
 
@@ -76,11 +76,6 @@ class TestContextLogger(object):
             msg='qux',
             args=(1, 2, 3),
             exc_info=None), logging.LogRecord)
-
-
-def test_get_default_logger():
-    """It can get the default logger."""
-    assert isinstance(get_default_logger(), ContextLogger)
 
 
 def test_generate_correlation_id():
