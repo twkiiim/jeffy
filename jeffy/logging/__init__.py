@@ -64,26 +64,6 @@ class ContextLogger(logging.Logger):
         return record
 
 
-def get_default_logger(name: str = 'jeffy') -> ContextLogger:
-    """
-    Get the default logger of Jeffy.
-
-    Parameters
-    ----------
-    name: str
-        Logger name
-
-    Returns
-    -------
-    jeffy.logging.ContextLogger
-    """
-    logger = ContextLogger(name)    # type: ignore
-    h = logging.StreamHandler()
-    h.setFormatter(JsonFormatter())
-    logger.addHandler(h)
-    return logger
-
-
 def generate_correlation_id() -> str:
     """Generate correlation id."""
     return str(uuid.uuid4())
