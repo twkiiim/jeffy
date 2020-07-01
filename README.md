@@ -548,3 +548,9 @@ License
 -------
 
 MIT License (see [LICENSE](https://github.com/serverless-operations/jeffy/blob/master/LICENSE))
+
+# Japanese Repositry
+Jeffy has many users who can speak Japanese as their first language.
+You can give feedback and discuss about Jeffy in Japanese here if you want.
+
+[Jeffy日本語リポジトリ](https://github.com/serverless-operations/jeffy-ja)
