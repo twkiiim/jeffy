@@ -46,6 +46,9 @@ class Sqs(SdkBase):
         """
         Send message to SQS Queue with correlationid.
 
+        Can use types _encodable_ as the message argument. By default JsonEncoder is used. 
+        It recommended to use the default.
+
         Usage::
             >>> from jeffy.sdk.sqs import Sqs
             >>> Sqs().send_message(...)
