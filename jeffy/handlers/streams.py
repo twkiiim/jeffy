@@ -60,9 +60,8 @@ class StreamsHandlerMixin(object):
 
         Usage::
             >>> from jeffy.framework import get_app
-            >>> from jeffy.encoding.json import JsonEncoding
             >>> app = get_app()
-            >>> @app.handlers.kinesis_streams(encoding=JsonEncoding())
+            >>> @app.handlers.kinesis_streams()
             ... def handler(event, context):
             ...     return event['body']['foo']
         """
@@ -86,3 +85,42 @@ class StreamsHandlerMixin(object):
                 return ret
             return wrapper
         return _kinesis_streams
+
+    def kinesis_streams_raw(
+        self,
+        encoding: Encoding = JsonEncoding(),
+        validator: Validator = NoneValidator()
+    ) -> Callable:
+        """
+        Decorator for Kinesis stream raw event (with all metadatas).
+
+        Automatically divide 'Records' and pass the record to main process of Lambda.
+
+        Usage::
+            >>> from jeffy.framework import get_app
+            >>> app = get_app()
+            >>> @app.handlers.kinesis_streams_raw()
+            ... def handler(event, context):
+            ...     return event['kinesis']['data']
+        """
+
+        def _kinesis_streams_raw(func: Callable) -> Callable:     # type: ignore
+            @functools.wraps(func)
+            def wrapper(event, context):                                    # type: ignore
+                ret = []
+                for record in event['Records']:
+                    message = encoding.decode(base64.b64decode(record['kinesis']['data']))
+                    validator.validate(message)
+                    self.capture_correlation_id(message)
+                    record['kinesis']['data'] = message
+                    try:
+                        self.app.logger.info(message)
+                        result = func(record, context)
+                        self.app.logger.info(result)
+                        ret.append(result)
+                    except Exception as e:
+                        self.app.logger.exception(e)
+                        raise e
+                return ret
+            return wrapper
+        return _kinesis_streams_raw
