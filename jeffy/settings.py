@@ -22,6 +22,8 @@ class Logging(object):
         ----------
         logger: logging.Logger
             Logger
+        handlers: List[logging.Handler]
+            Logging handlers
         log_level: int = logging.INFO
             Log level
         correlation_attr_name: str = 'correlation_id'

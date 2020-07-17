@@ -81,6 +81,26 @@ class TestHandlers(object):
                 {'Records': [{'kinesis': {'data': base64.b64encode(json.dumps({'bar': 'buz'}).encode('utf-8'))}}]},
                 None)
 
+    def test_kinesis_streams_raw(self, handlers, mocker):
+        """It can process kinesis stream events."""
+        mock = mocker.Mock(return_value='foo')
+        kinesis_streams_raw = handlers.kinesis_streams_raw()
+        _kinesis_streams_raw = kinesis_streams_raw(mock)
+        assert _kinesis_streams_raw(
+            {'Records': [{'kinesis': {'data': base64.b64encode(json.dumps({'bar': 'buz'}).encode('utf-8'))}}]},
+            None
+        ) == ['foo']
+
+    def test_kinesis_streams_raw_error(self, handlers, mocker):
+        """It raises a exception."""
+        mock = mocker.Mock(side_effect=Exception('foo'))
+        kinesis_streams_raw = handlers.kinesis_streams_raw()
+        _kinesis_streams_raw = kinesis_streams_raw(mock)
+        with pytest.raises(Exception):
+            _kinesis_streams_raw(
+                {'Records': [{'kinesis': {'data': base64.b64encode(json.dumps({'bar': 'buz'}).encode('utf-8'))}}]},
+                None)
+
     def test_sqs(self, handlers, mocker):
         """It can process sqs events."""
         mock = mocker.Mock(return_value='foo')
@@ -99,6 +119,24 @@ class TestHandlers(object):
         with pytest.raises(Exception):
             _sqs({'Records': [{'body': json.dumps({'bar': 'buz'})}]}, None)
 
+    def test_sqs_raw(self, handlers, mocker):
+        """It can process sqs events."""
+        mock = mocker.Mock(return_value='foo')
+        sqs_raw = handlers.sqs_raw()
+        _sqs_raw = sqs_raw(mock)
+        assert _sqs_raw(
+            {'Records': [{'body': json.dumps({'bar': 'buz'})}]},
+            None
+        ) == ['foo']
+
+    def test_sqs_raw_error(self, handlers, mocker):
+        """It raises a exception."""
+        mock = mocker.Mock(side_effect=Exception('foo'))
+        sqs_raw = handlers.sqs_raw()
+        _sqs_raw = sqs_raw(mock)
+        with pytest.raises(Exception):
+            _sqs_raw({'Records': [{'body': json.dumps({'bar': 'buz'})}]}, None)
+
     def test_sns(self, handlers, mocker):
         """It can process sns events."""
         mock = mocker.Mock(return_value='foo')
@@ -116,6 +154,24 @@ class TestHandlers(object):
         _sns = sns(mock)
         with pytest.raises(Exception):
             _sns({'Records': [{'Sns': {'Message': json.dumps({'bar': 'buz'})}}]}, None)
+
+    def test_sns_raw(self, handlers, mocker):
+        """It can process sns events."""
+        mock = mocker.Mock(return_value='foo')
+        sns_raw = handlers.sns_raw()
+        _sns_raw = sns_raw(mock)
+        assert _sns_raw(
+            {'Records': [{'Sns': {'Message': json.dumps({'bar': 'buz'})}}]},
+            None
+        ) == ['foo']
+
+    def test_sns_raw_error(self, handlers, mocker):
+        """It raises a exception."""
+        mock = mocker.Mock(side_effect=Exception('foo'))
+        sns_raw = handlers.sns_raw()
+        _sns_raw = sns_raw(mock)
+        with pytest.raises(Exception):
+            _sns_raw({'Records': [{'Sns': {'Message': json.dumps({'bar': 'buz'})}}]}, None)
 
     def test_schedule(self, handlers, mocker):
         """It can process sns events."""

@@ -30,11 +30,14 @@ Mainly, Jeffy is focusing on three things.
 	* 2.1. [common](#common)
 	* 2.2. [rest_api](#rest_api)
 	* 2.3. [sqs](#sqs)
-	* 2.4. [sns](#sns)
-	* 2.5. [kinesis_streams](#kinesis_streams)
-	* 2.6. [dynamodb_streams](#dynamodb_streams)
-	* 2.7. [s3](#s3)
-	* 2.8. [schedule](#schedule)
+	* 2.4. [sqs_raw](#sqs_raw)
+	* 2.5. [sns](#sns)
+	* 2.6. [sns_raw](#sns_raw)
+	* 2.7. [kinesis_streams](#kinesis_streams)
+	* 2.8. [kinesis_streams_raw](#kinesis_streams_raw)
+	* 2.9. [dynamodb_streams](#dynamodb_streams)
+	* 2.10. [s3](#s3)
+	* 2.11. [schedule](#schedule)
 * 3. [SDK](#SDK)
 	* 3.1. [Kinesis Clinent](#KinesisClinent)
 	* 3.2. [SNS Client](#SNSClient)
@@ -271,7 +274,21 @@ def handler(event, context):
     """
 ```
 
-###  2.4. <a name='sns'></a>sns
+###  2.4. <a name='sqs_raw'></a>sqs_raw
+Decorator for sqs raw event (with all metadatas). Automaticlly parse `"event.Records"` list from SQS event source and pass the each records to main process of Lambda.
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
+
+```python
+from jeffy.framework import get_app
+app = get_app()
+
+@app.handlers.sqs_raw()
+def handler(event, context):
+    return event['body']
+```
+
+###  2.5. <a name='sns'></a>sns
 Decorator for sns event. Automaticlly parse `event.Records` list from SNS event source to each items for making it easy to treat it inside main process of Lambda.
 
 Default encoding is `jeffy.encoding.json.JsonEncoding`.
@@ -295,7 +312,21 @@ def handler(event, context):
     """
 ```
 
-###  2.5. <a name='kinesis_streams'></a>kinesis_streams
+###  2.6. <a name='sns_raw'></a>sns_raw
+Decorator for sqs raw event (with all metadatas). Automaticlly parse `"event.Records"` list from SNS event source and pass the each records to main process of Lambda.
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
+
+```python
+from jeffy.framework import get_app
+app = get_app()
+
+@app.handlers.sns_raw()
+def handler(event, context):
+    return event['Sns']['Message']
+```
+
+###  2.7. <a name='kinesis_streams'></a>kinesis_streams
 Decorator for kinesis stream event. Automaticlly parse `event.Records` list from Kinesis event source to each items and decode it with base64 for making it easy to treat it inside main process of Lambda.
 
 Default encoding is `jeffy.encoding.json.JsonEncoding`.
@@ -319,7 +350,21 @@ def handler(event, context):
     """
 ```
 
-###  2.6. <a name='dynamodb_streams'></a>dynamodb_streams
+###  2.8. <a name='kinesis_streams_raw'></a>kinesis_streams_raw
+Decorator for sqs raw event (with all metadatas). Automaticlly parse `"event.Records"` list from Kinesis Data Streams event source and pass the each records to main process of Lambda.
+
+Default encoding is `jeffy.encoding.json.JsonEncoding`.
+
+```python
+from jeffy.framework import get_app
+app = get_app()
+
+@app.handlers.sns_raw()
+def handler(event, context):
+    return event['kinesis']['data']
+```
+
+###  2.9. <a name='dynamodb_streams'></a>dynamodb_streams
 Decorator for dynamodb stream event. Automaticlly parse `event.Records` list from Dynamodb event source to  items for making it easy to treat it inside main process of Lambda.
 
 ```python
@@ -341,7 +386,7 @@ def handler(event, context):
     """
 ```
 
-###  2.7. <a name='s3'></a>s3
+###  2.10. <a name='s3'></a>s3
 Decorator for S3 event. Automatically parse body stream from triggered S3 object and S3 bucket and key name to Lambda.
 
 **This handler requires `s3:GetObject` permission.**
@@ -361,7 +406,7 @@ def handler(event, context):
     event['metadata']       # object matadata
 ```
 
-###  2.8. <a name='schedule'></a>schedule
+###  2.11. <a name='schedule'></a>schedule
 Decorator for schedule event. just captures correlation id before main Lambda process. do nothing other than that.
 
 ```python
