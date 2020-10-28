@@ -6,7 +6,6 @@ from jeffy.settings import (
 
 app = None
 
-
 class Jeffy(object):
     """Jeffy framework main class."""
 
