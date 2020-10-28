@@ -26,6 +26,7 @@ def context_logger():
 
 class DummyRecord:
     """Dummy LogRecord class."""
+    
     pass
 
 
